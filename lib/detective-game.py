@@ -80,7 +80,7 @@ def admin_menu():
             with session_scope() as session:
                 success = delete_user(username_to_delete, session)
                 if success:
-                    print(f"User {username_to_delete} deleted successfully.")
+                    print(f"User '{username_to_delete}' deleted successfully.")
                 else:
                     print("User not found or could not be deleted.")
         elif choice == "2":
@@ -120,14 +120,15 @@ def start_investigation(player_name):
         elif choice == "4":
             won = make_accusation(player_name)
             game_over = True
+            if won:
+                complete_game(player_name, won=won)
         elif choice == "5":
             print("Thank you for playing. Goodbye!")
             game_over = True
         else:
             print("Invalid choice, please try again.")
+    return won
 
-    if game_over and choice == "4":
-     complete_game(player_name, won=won)
 
 def investigate_character(character_number):
     character_name = ["Hunter", "Kent", "Kairi"][character_number - 1]
@@ -180,11 +181,30 @@ def investigate_character(character_number):
         print(f"{i}. {question}")
     print("4. Return to main menu")
 
+    responses = {
+        "Hunter": [
+            "Yo, I smashed Heihachi's face in!",
+            "While I was gaming Kent seemed to be acting sneaky",
+            "I think everyone is jealous of my insane godfist speed."
+        ],
+        "Kent": [
+            "Just making some python visualizations.",
+            "Nope, nothing, not at all. No sus here.",
+            "Hunter plays that violent fighting game a LOT."
+        ],
+        "Kairi": [
+            "Studying! Study study study all day every day.",
+            "Hard to see much other than code and numbers these days.",
+            "I think Kent is jealous of Hunter's gaming abilities."
+        ]
+    }
+
     while True:
-        choice = input("Choose a question to ask: ")
+        choice = input("Choose a question to ask from above: ")
 
         if choice in ["1", "2", "3"]:
-            print(f"{character_name} says: [Placeholder response for question {choice}]")
+            index = int(choice) - 1  
+            print(f"{character_name} says: {responses[character_name][index]}")
         elif choice == "4":
             break
         else:
@@ -204,6 +224,15 @@ def make_accusation(player_name):
         return True
     else:
         print("Wrong accusation. The killer gets away. You lose.")
+        print("""
+     _       __           _   
+    | |     / _|         | |  
+  __| | ___| |_ ___  __ _| |_ 
+ / _` |/ _ \  _/ _ \/ _` | __|
+| (_| |  __/ ||  __/ (_| | |_ 
+ \__,_|\___|_| \___|\__,_|\__|
+                              
+""")
         return False
 
 def complete_game(user_name, won=False):

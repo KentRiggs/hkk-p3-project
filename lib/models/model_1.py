@@ -35,7 +35,6 @@ def delete_user(name, session):
     if user:
         session.delete(user)
         session.commit()
-        print(f"User '{name}' deleted successfully.")
         return True
     print(f"User '{name}' not found.")
     return False
@@ -77,16 +76,15 @@ def session_scope():
     finally:
         session.close()
 
-with session_scope() as session:
-    user = find_user_by_name("some_username", session)
-    if user:
-        print(f"{user.name} has {user.wins} wins.")
-    else:
-        print("User not found.")
+if __name__ == "__main__":
+    with session_scope() as session:
+        user = find_user_by_name("some_username", session)
+        if user:
+            print(f"{user.name} has {user.wins} wins.")
+        else:
+            print("User not found.")
 
-with session_scope() as session:
-    success = delete_user("some_username", session)
-    if success:
-        print(f"User deleted successfully.")
-    else:
-        print("User not found or could not be deleted.")
+    with session_scope() as session:
+        success = delete_user("some_username", session)
+        if not success:
+         print("User not found or could not be deleted.")
