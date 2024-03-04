@@ -1,7 +1,8 @@
 # lib/cli.py
-from models.model_1 import engine, Base, session_scope, create_user, delete_user, update_user_wins, find_user_by_name, list_all_users
-Base.metadata.create_all(engine)
-
+from models.model_1 import (
+    initialize_database,
+    User,
+)
 
 
 def display_main_menu():
@@ -51,21 +52,18 @@ def display_main_menu():
             admin_menu()
             continue
         elif input_value.strip():
-            player_name = input_value
-            with session_scope() as session:
-                user, created = create_user(player_name, session=session)
-                if created:
-                    print(f"\nWelcome, {player_name}! Let's start your first game.")
-                    won = start_investigation(player_name)
-                    game_over = True
-                    break
-                else:
-                    print(f"\nWelcome back, {user.name}! You have {user.wins} wins.")
-                    won = start_investigation(player_name)
-                    game_over = True
-                    break  
+            player_name = input_value.strip()
+            user_id, created = User.create_user(player_name)
+            user = User.find_user_by_name(player_name)
+            if created:
+                print(f"\nWelcome, {player_name}! Let's start your first game.")
+            else:
+                print(f"\nWelcome back, {player_name}! You have {user.wins} wins.")
+            won = start_investigation(player_name)
+            game_over = True
+            break  
         else:
-            print("You must enter a valid name to start the game.")
+         print("You must enter a valid name to start the game.")
             
 def admin_menu():
     while True:
@@ -77,15 +75,13 @@ def admin_menu():
 
         if choice == "1":
             username_to_delete = input("Enter the username to delete: ")
-            with session_scope() as session:
-                success = delete_user(username_to_delete, session)
-                if success:
+            success = User.delete_user(username_to_delete)
+            if success:
                     print(f"User '{username_to_delete}' deleted successfully.")
-                else:
+            else:
                     print("User not found or could not be deleted.")
         elif choice == "2":
-             with session_scope() as session:
-                list_all_users(session)
+             User.list_all_users()
         elif choice == "3":
             print("Returning to the main menu...")
             return
@@ -236,9 +232,9 @@ def make_accusation(player_name):
         return False
 
 def complete_game(user_name, won=False):
-     with session_scope() as session:
         if won:
-            if update_user_wins(user_name, session=session):
+            if User.update_user_wins(user_name):
+
                 print("Congratulations! Your win has been recorded.")
                 print("""  
        _      _                   
@@ -254,7 +250,7 @@ __   ___  ___| |_ ___  _ __ _   _
                 print("Couldn't update your wins. Please try again.")
         else:
             print("Better luck next time!")
-     return False
 
 if __name__ == "__main__":
+    initialize_database()
     display_main_menu()
