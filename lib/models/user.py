@@ -1,33 +1,6 @@
+from .database import get_db_connection
 import sqlite3
-from contextlib import contextmanager
 
-DATABASE_NAME = 'game.db'
-
-@contextmanager
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE_NAME)
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-def initialize_database():
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            name TEXT UNIQUE NOT NULL,
-            wins INTEGER DEFAULT 0
-        );
-        """)
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS questions (
-            id INTEGER PRIMARY KEY,
-            question_text TEXT
-        );
-        """)
-        conn.commit()
 
 class User:
     def __init__(self, id=None, name=None, wins=0):
@@ -89,18 +62,15 @@ class User:
         for user in users:
             print(f"User: {user[1]}, Wins: {user[2]}")
 
-class Question:
-    def __init__(self, id=None, question_text=None):
-        self.id = id
-        self.question_text = question_text
-
-if __name__ == "__main__":
-    initialize_database()
-    user_id, created = User.create_user("John Doe")
-    user = User.find_user_by_name("John Doe")
-    if user:
-        print(f"{user.name} has {user.wins} wins.")
-        User.update_user_wins(user.name, 3)
-        User.delete_user(user.name)
-    else:
-        print("User not found.")
+    @staticmethod
+    def create_table():
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY,
+                name TEXT UNIQUE NOT NULL,
+                wins INTEGER DEFAULT 0
+            );
+            """)
+            conn.commit()

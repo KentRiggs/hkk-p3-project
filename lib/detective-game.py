@@ -1,9 +1,7 @@
-# lib/cli.py
-from models.model_1 import (
-    initialize_database,
-    User,
-)
-
+from models.initialize_db import initialize_database
+from models.user import User
+from models.npcs import NPC
+from models.response import Response
 
 def display_main_menu():
  game_over = False
