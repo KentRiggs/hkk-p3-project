@@ -1,4 +1,3 @@
-# lib/cli.py
 import sqlite3
 from contextlib import contextmanager
 
