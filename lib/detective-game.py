@@ -6,6 +6,18 @@ import random
 
 
 
+
+responseplaceholdername = Response(
+    name="placeholder", 
+    responses=["string one", "string two", "string three"], 
+    is_suspicious=False  # change to true if its a suspicious response
+)
+
+if responseplaceholdername.create_response():
+    print("New response has been created and saved to the database.")
+else:
+    print("Failed to create new response in the database.")
+
 # NPC.update_ascii_art("Kairi", """
 # ➖➖🟩🟩🟩
 # ➖🟩🟩🟩🟩🟩
