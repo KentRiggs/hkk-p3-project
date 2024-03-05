@@ -2,6 +2,43 @@ from models.initialize_db import initialize_database
 from models.user import User
 from models.npcs import NPC
 from models.response import Response
+import random
+
+
+
+# NPC.update_ascii_art("Kairi", """
+# ➖➖🟩🟩🟩
+# ➖🟩🟩🟩🟩🟩
+# 🟩🟩🟩🟨🟨🟨
+# 🟩🟩🟩🟨🟨🟨
+# 🟩🟩🟩🟩🟩🟩
+# 🟩🟩🟩🟩🟩🟩
+# ➖🟩🟩🟩🟩🟩
+# ➖🟩🟩➖🟩🟩
+# ➖🟩🟩➖🟩🟩""")
+
+# npcs = NPC.list_all_npcs()
+
+# for npc in npcs:
+#    print(f"Name: {npc.name}, ASCII Art: {npc.ascii_art}, Is Killer: {npc.is_killer}")
+
+
+# npc = NPC(name="Batsheva", ascii_art="""
+# ➖➖🟨🟨🟨           
+# ➖🟨🟨🟨🟨🟨  
+# 🟨🟨🟨🟪🟪🟪  
+# 🟨🟨🟨🟪🟪🟪   
+# 🟨🟨🟨🟨🟨🟨 
+# 🟨🟨🟨🟨🟨🟨    
+# ➖🟨🟨🟨🟨🟨
+# ➖🟨🟨➖🟨🟨    
+# ➖🟨🟨➖🟨🟨""", is_killer=False)
+# npc_created = npc.create_npc()
+# if npc_created:
+#     print("NPC created successfully!")
+# else:
+#     print("Failed to create NPC.")
+
 
 def display_main_menu():
  game_over = False
@@ -90,29 +127,33 @@ def admin_menu():
 def start_investigation(player_name):
     game_over = False
     won = False
+    npc_candidates = NPC.list_all_npcs()
+    filtered_npcs = [npc for npc in npc_candidates if npc.name not in ["NPC1", "NPC2"]]
+    selected_npcs = random.sample(filtered_npcs, 3)
+    killer_npc = random.choice(selected_npcs)
+    killer_npc.is_killer = True
+
+    for npc in selected_npcs:
+        if npc.is_killer:
+            npc.responses = generate_responses(is_suspicious=True, npc_name=npc.name)
+        else:
+            npc.responses = generate_responses(is_suspicious=False, npc_name=npc.name)
+
     while not game_over:
         print("One of these suspects recently killed somebody.")
-        print(""" 
-          
- ➖➖🟥🟥🟥          ➖➖🟦🟦🟦           ➖➖🟩🟩🟩  
-➖🟥🟥🟥🟥🟥        ➖🟦🟦🟦🟦🟦         ➖🟩🟩🟩🟩🟩
-🟥🟥🟥🟦🟦🟦        🟦🟦🟦🟥🟥🟥         🟩🟩🟩🟨🟨🟨
-🟥🟥🟥🟦🟦🟦        🟦🟦🟦🟥🟥🟥         🟩🟩🟩🟨🟨🟨
-🟥🟥🟥🟥🟥🟥        🟦🟦🟦🟦🟦🟦         🟩🟩🟩🟩🟩🟩
-🟥🟥🟥🟥🟥🟥        🟦🟦🟦🟦🟦🟦         🟩🟩🟩🟩🟩🟩
-➖🟥🟥🟥🟥🟥        ➖🟦🟦🟦🟦🟦         ➖🟩🟩🟩🟩🟩
-➖🟥🟥➖🟥🟥        ➖🟦🟦➖🟦🟦         ➖🟩🟩➖🟩🟩
-➖🟥🟥➖🟥🟥        ➖🟦🟦➖🟦🟦         ➖🟩🟩➖🟩🟩
-           """)
+        for npc in selected_npcs:
+            print(f"Name: {npc.name}")
+            print(f"{npc.ascii_art}")
+
         print("\nPress 1, 2, or 3 to choose which character to investigate.")
         print("Press 4 to accuse a character.")
         print("Press 5 to exit.")
         choice = input("Your choice: ")
 
         if choice in ["1", "2", "3"]:
-            investigate_character(int(choice))
+            investigate_character(selected_npcs[int(choice) - 1])
         elif choice == "4":
-            won = make_accusation(player_name)
+            won = make_accusation(player_name, selected_npcs)
             game_over = True
             if won:
                 complete_game(player_name, won=won)
@@ -123,98 +164,50 @@ def start_investigation(player_name):
             print("Invalid choice, please try again.")
     return won
 
+def generate_responses(is_suspicious, npc_name):
+    if is_suspicious:
+        suspicious_sets = Response.get_suspicious_responses()
+        selected_set = random.choice(suspicious_sets)
+    else:
+        innocent_sets = Response.get_innocent_responses()
+        selected_set = random.choice(innocent_sets)
+    
+    return selected_set[2:]
 
-def investigate_character(character_number):
-    character_name = ["Hunter", "Kent", "Kairi"][character_number - 1]
 
-    ascii_art = {
-        
-        1:"""
-        ➖➖🟥🟥🟥
-        ➖🟥🟥🟥🟥🟥
-        🟥🟥🟥🟦🟦🟦
-        🟥🟥🟥🟦🟦🟦
-        🟥🟥🟥🟥🟥🟥
-        🟥🟥🟥🟥🟥🟥
-        ➖🟥🟥🟥🟥🟥
-        ➖🟥🟥➖🟥🟥
-        ➖🟥🟥➖🟥🟥 
-        """,
-        2:"""
-        ➖➖🟦🟦🟦
-        ➖🟦🟦🟦🟦🟦
-        🟦🟦🟦🟥🟥🟥
-        🟦🟦🟦🟥🟥🟥
-        🟦🟦🟦🟦🟦🟦
-        🟦🟦🟦🟦🟦🟦
-        ➖🟦🟦🟦🟦🟦
-        ➖🟦🟦➖🟦🟦
-        ➖🟦🟦➖🟦🟦
-        """,
-        3:"""
-        ➖➖🟩🟩🟩
-        ➖🟩🟩🟩🟩🟩
-        🟩🟩🟩🟨🟨🟨
-        🟩🟩🟩🟨🟨🟨
-        🟩🟩🟩🟩🟩🟩
-        🟩🟩🟩🟩🟩🟩
-        ➖🟩🟩🟩🟩🟩
-        ➖🟩🟩➖🟩🟩
-        ➖🟩🟩➖🟩🟩
-        """
-        }
-    print(ascii_art[character_number])
-    print(f"You are now speaking to {character_name}. Here are some questions you can ask them:")
-
-    questions = [
-        "What were you doing last night?",
-        "Have you seen anything suspicious?",
-        "Do you know who might have a motive?"
-    ]
+def investigate_character(npc):
+    print(npc.ascii_art)
+    print(f"\nYou are now speaking to {npc.name}. Here are some questions you can ask them:")
+    questions = ["What were you doing last night?",
+                 "Have you seen anything suspicious?",
+                "Do you know who might have a motive?"]
     for i, question in enumerate(questions, 1):
         print(f"{i}. {question}")
-    print("4. Return to main menu")
-
-    responses = {
-        "Hunter": [
-            "Yo, I smashed Heihachi's face in!",
-            "While I was gaming Kent seemed to be acting sneaky",
-            "I think everyone is jealous of my insane godfist speed."
-        ],
-        "Kent": [
-            "Just making some python visualizations.",
-            "Nope, nothing, not at all. No sus here.",
-            "Hunter plays that violent fighting game a LOT."
-        ],
-        "Kairi": [
-            "Studying! Study study study all day every day.",
-            "Hard to see much other than code and numbers these days.",
-            "I think Kent is jealous of Hunter's gaming abilities."
-        ]
-    }
+    print("4. (Go back).")
 
     while True:
         choice = input("Choose a question to ask from above: ")
 
         if choice in ["1", "2", "3"]:
             index = int(choice) - 1  
-            print(f"{character_name} says: {responses[character_name][index]}")
+            question = questions[index]
+            response = npc.responses[index] 
+            print(f"{npc.name} says: {response}")
         elif choice == "4":
             break
         else:
             print("Invalid choice, please try again.")
 
-def make_accusation(player_name):
+def make_accusation(player_name, selected_npcs):
     print("\nWho do you think the killer is?")
-    print("1. Hunter")
-    print("2. Kent")
-    print("3. Kairi")
+    for i, npc in enumerate(selected_npcs, 1):
+        print(f"{i}. {npc.name}")
+    
     choice = input("Your accusation: ")
-
-
-    murderer = "2"  
-    if choice == murderer:
-        print("You have excellent judgement! The Killer has been apprehended.")
+    accused_npc = selected_npcs[int(choice) - 1]
+    
+    if accused_npc.is_killer:
+        print("You have excellent judgement! you have identified the killer. You win!")
         return True
     else:
         print("Wrong accusation. The killer gets away. You lose.")
@@ -225,7 +218,7 @@ def make_accusation(player_name):
  / _` |/ _ \  _/ _ \/ _` | __|
 | (_| |  __/ ||  __/ (_| | |_ 
  \__,_|\___|_| \___|\__,_|\__|
-                              
+
 """)
         return False
 
@@ -252,3 +245,4 @@ __   ___  ___| |_ ___  _ __ _   _
 if __name__ == "__main__":
     initialize_database()
     display_main_menu()
+
