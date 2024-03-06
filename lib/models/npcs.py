@@ -33,6 +33,7 @@ class NPC:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM npcs WHERE name = ?", (npc_name,))
             if cursor.rowcount > 0:
+                conn.commit()
                 print(f"NPC '{npc_name}' deleted successfully.")
                 return True
             else:

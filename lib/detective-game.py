@@ -4,68 +4,6 @@ from models.npcs import NPC
 from models.response import Response
 import random
 
-
-
-# response_name_to_delete = "placeholder"
-# deletion_success = Response.delete_response("placeholder")
-
-# if deletion_success:
-#     print(f"The response with the name '{response_name_to_delete}' was deleted successfully.")
-# else:
-#     print(f"The response with the name '{response_name_to_delete}' could not be found or deleted.")
-
-
-# all_responses = Response.list_all_responses()
-# for response in all_responses:
-#     print(response)
-
-# Response.delete_response("innocent3")
-
-# seventhinnocent = Response(
-#     name="seventhinnocent", 
-#     responses=["I headed over to do the Asteroids task in Weapons. It's actually kind of fun, despite the tension in the game.", "Not exactly suspicious, but the emergency meeting was called right as I was about to complete a long task. Frustrating timing!", "Honestly, it's anyone's guess. I've been trying to stick with groups to avoid getting picked off. Haven't really noticed anyone acting with a motive."], 
-#     is_suspicious=False  # change to true if its a suspicious response
-# )
-
-# if seventhinnocent.create_response():
-#     print("New response has been created and saved to the database.")
-# else:
-#     print("Failed to create new response in the database.")
-
-# NPC.update_ascii_art("Kairi", """
-# ➖➖🟩🟩🟩
-# ➖🟩🟩🟩🟩🟩
-# 🟩🟩🟩🟨🟨🟨
-# 🟩🟩🟩🟨🟨🟨
-# 🟩🟩🟩🟩🟩🟩
-# 🟩🟩🟩🟩🟩🟩
-# ➖🟩🟩🟩🟩🟩
-# ➖🟩🟩➖🟩🟩
-# ➖🟩🟩➖🟩🟩""")
-
-# npcs = NPC.list_all_npcs()
-
-# for npc in npcs:
-#    print(f"Name: {npc.name}, ASCII Art: {npc.ascii_art}, Is Killer: {npc.is_killer}")
-
-
-# npc = NPC(name="Batsheva", ascii_art="""
-# ➖➖🟨🟨🟨           
-# ➖🟨🟨🟨🟨🟨  
-# 🟨🟨🟨🟪🟪🟪  
-# 🟨🟨🟨🟪🟪🟪   
-# 🟨🟨🟨🟨🟨🟨 
-# 🟨🟨🟨🟨🟨🟨    
-# ➖🟨🟨🟨🟨🟨
-# ➖🟨🟨➖🟨🟨    
-# ➖🟨🟨➖🟨🟨""", is_killer=False)
-# npc_created = npc.create_npc()
-# if npc_created:
-#     print("NPC created successfully!")
-# else:
-#     print("Failed to create NPC.")
-
-
 def display_main_menu():
  game_over = False
  won = False
@@ -129,9 +67,15 @@ def display_main_menu():
 def admin_menu():
     while True:
         print("\nAdmin Menu:")
+        print("0. Exit admin menu")
         print("1. Delete a user")
         print("2. List all users")
-        print("3. Exit admin menu")
+        print("3. Add an NPC")
+        print("4. List all NPCs")
+        print("5. Delete an NPC")
+        print("6. Add new response")
+        print("7. List all responses")
+        print("8. Delete a response")
         choice = input("Your choice: ")
 
         if choice == "1":
@@ -144,6 +88,47 @@ def admin_menu():
         elif choice == "2":
              User.list_all_users()
         elif choice == "3":
+            name = input("Enter NPC name: ")
+            ascii_art = input("Enter NPC ASCII art (paste here): ")
+            is_killer = input("Is this NPC a killer? (yes/no): ").lower() == 'yes'
+            npc = NPC(name=name, ascii_art=ascii_art, is_killer=is_killer)
+            npc_created = npc.create_npc()
+            if npc_created:
+                print("NPC created/updated successfully!")
+            else:
+                print("Failed to create NPC.")
+        elif choice == "4":
+             npcs = NPC.list_all_npcs()
+             for npc in npcs:
+                print(f"Name: {npc.name}, ASCII Art: {npc.ascii_art}, Is Killer: {npc.is_killer}")
+        elif choice == "5":
+            npc_name_to_delete = input("Enter the NPC name to delete: ")
+            deletion_success = NPC.delete_npc(npc_name_to_delete)
+            if deletion_success:
+                print(f"The NPC '{npc_name_to_delete}' was deleted successfully.")
+            else:
+                print(f"The NPC '{npc_name_to_delete}' could not be found or deleted.")
+        elif choice == "6":
+            response_name = input("Enter response name (identifier): ")
+            responses = input("Enter responses (separate by '|'): ").split('|')
+            is_suspicious = input("Is this response suspicious? (yes/no): ").lower() == 'yes'
+            response = Response(name=response_name, responses=responses, is_suspicious=is_suspicious)
+            if response.create_response():
+                print("New response has been created and saved to the database.")
+            else:
+                print("Failed to create new response in the database.")
+        elif choice == "7":
+             all_responses = Response.list_all_responses()
+             for response in all_responses:
+                print(response)
+        elif choice == "8":
+            response_name_to_delete = input("Enter the response name to delete: ")
+            deletion_success = Response.delete_response(response_name_to_delete)
+            if deletion_success:
+                print(f"The response '{response_name_to_delete}' was deleted successfully.")
+            else:
+                print(f"The response '{response_name_to_delete}' could not be found or deleted.")
+        elif choice == "0":
             print("Returning to the main menu...")
             return
         else:
