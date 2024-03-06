@@ -23,11 +23,12 @@ class Response:
                 print("Failed to create response.")
                 return False
     @staticmethod
-    def delete_response(response_id):
+    def delete_response(response_name):
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM responses WHERE id = ?", (response_id, ))
+            cursor.execute("DELETE FROM responses WHERE name = ?", (response_name, ))
             if cursor.rowcount > 0:
+                conn.commit()
                 print("Response deleted successfully.")
                 return True
             else:

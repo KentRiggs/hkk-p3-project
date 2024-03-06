@@ -6,17 +6,31 @@ import random
 
 
 
+# response_name_to_delete = "placeholder"
+# deletion_success = Response.delete_response("placeholder")
 
-responseplaceholdername = Response(
-    name="placeholder", 
-    responses=["string one", "string two", "string three"], 
-    is_suspicious=False  # change to true if its a suspicious response
-)
+# if deletion_success:
+#     print(f"The response with the name '{response_name_to_delete}' was deleted successfully.")
+# else:
+#     print(f"The response with the name '{response_name_to_delete}' could not be found or deleted.")
 
-if responseplaceholdername.create_response():
-    print("New response has been created and saved to the database.")
-else:
-    print("Failed to create new response in the database.")
+
+# all_responses = Response.list_all_responses()
+# for response in all_responses:
+#     print(response)
+
+# Response.delete_response("innocent3")
+
+# seventhinnocent = Response(
+#     name="seventhinnocent", 
+#     responses=["I headed over to do the Asteroids task in Weapons. It's actually kind of fun, despite the tension in the game.", "Not exactly suspicious, but the emergency meeting was called right as I was about to complete a long task. Frustrating timing!", "Honestly, it's anyone's guess. I've been trying to stick with groups to avoid getting picked off. Haven't really noticed anyone acting with a motive."], 
+#     is_suspicious=False  # change to true if its a suspicious response
+# )
+
+# if seventhinnocent.create_response():
+#     print("New response has been created and saved to the database.")
+# else:
+#     print("Failed to create new response in the database.")
 
 # NPC.update_ascii_art("Kairi", """
 # ➖➖🟩🟩🟩
@@ -145,11 +159,20 @@ def start_investigation(player_name):
     killer_npc = random.choice(selected_npcs)
     killer_npc.is_killer = True
 
+    responses_pool = {}  
+
+
     for npc in selected_npcs:
         if npc.is_killer:
             npc.responses = generate_responses(is_suspicious=True, npc_name=npc.name)
         else:
             npc.responses = generate_responses(is_suspicious=False, npc_name=npc.name)
+
+
+        unique_response = None
+        while unique_response is None or unique_response in responses_pool.values():
+            unique_response = random.choice(npc.responses)
+        responses_pool[npc.name] = unique_response
 
     while not game_over:
         print("One of these suspects recently killed somebody.")
@@ -190,7 +213,7 @@ def generate_responses(is_suspicious, npc_name):
 def investigate_character(npc):
     print(npc.ascii_art)
     print(f"\nYou are now speaking to {npc.name}. Here are some questions you can ask them:")
-    questions = ["What were you doing last night?",
+    questions = ["What were you doing in the last 2 minutes?",
                  "Have you seen anything suspicious?",
                 "Do you know who might have a motive?"]
     for i, question in enumerate(questions, 1):
