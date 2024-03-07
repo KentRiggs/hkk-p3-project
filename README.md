@@ -2,9 +2,9 @@ How A Spud Got Away!
 
 **Overview**
 
-This project is a Python application designed to showcase the skills and topics learned in phase 3 of the Flatiron School. It includes an Object-Relational Mapping (ORM) system for database management and a Command-Line Interface (CLI) for user interaction. 
+This project is a Python application designed to showcase the skills and topics learned in phase 3 of the Flatiron School Software Engineering program. This includes an Object-Relational Mapping (ORM) system for database management and a Command-Line Interface (CLI) for user interaction. 
 
-The application allows users to play a game where they question NPCs via a CLI in the terminal to arrive at an accusation hopefully correctly deducing which of the NPCs is the killer to win the game. Players are only afforded one guess. Choose wisely!
+The application allows users to play a game where they question NPCs via a CLI in the terminal to arrive at an accusation, hopefully correctly, by deducing which of the NPCs is the killer to win the game. Players are only afforded one guess. Choose wisely!
 
 **Deliverables Met:**
 
@@ -57,9 +57,9 @@ To play How a Spud Got Away:
  2. cd into the root directory of hkk-p3-project
  3. Install additional dependencies with pipenv install once in the root
     directory
- 4. Use pipenv shell to ensure you're in the virtual environment cd into
-    the lib folder
- 5. use the command python detective-game.py to run the game
+ 4. Use pipenv shell to ensure you're in the virtual environment 
+ 5. cd into the lib sub-directory
+ 6. use the command: python detective-game.py to run the game
 
 
 **Usage:** 
